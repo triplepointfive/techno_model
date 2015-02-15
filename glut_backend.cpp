@@ -60,7 +60,7 @@ bool GLUTBackendCreateWindow(unsigned int Width, unsigned int Height, unsigned i
         return false;
     }
 
-    TwInit(TW_OPENGL_CORE, NULL);
+    TwInit(TW_OPENGL, NULL);
     TwWindowSize(1024, 768);
     TwBar * GUI = TwNewBar("Picking");
     TwSetParam(GUI, NULL, "refresh", TW_PARAM_CSTRING, 1, "0.1");
