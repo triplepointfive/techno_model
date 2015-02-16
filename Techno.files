@@ -17,3 +17,5 @@ technique.h
 texture.cpp
 texture.h
 util.h
+gradient_technique.h
+gradient_technique.cpp
