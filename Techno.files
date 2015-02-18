@@ -19,3 +19,5 @@ texture.h
 util.h
 gradient_technique.h
 gradient_technique.cpp
+frame_technique.h
+frame_technique.cpp

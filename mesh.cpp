@@ -48,34 +48,42 @@ void Mesh::Clear()
 
 bool Mesh::LoadMesh(const std::string& Filename)
 {
+//    printf("\n\nMesh::LoadMesh\n");
     // Удаляем данные предыдущей модели (если она была загружена)
     Clear();
+//    printf("1\n");
 
     bool Ret = false;
 
     Assimp::Importer Importer;
+//    printf("2\n");
 
     const aiScene* pScene = Importer.ReadFile(Filename.c_str(),
                                     aiProcess_Triangulate | aiProcess_GenSmoothNormals|
                                     aiProcess_FlipUVs);
 
+//    printf("3\n");
+
     if (pScene){
+//        printf("Successfully parsed\n");
         Ret = InitFromScene(pScene, Filename);
-    }
-    else {
+    } else {
         printf("Error parsing '%s': '%s'\n", Filename.c_str(), Importer.GetErrorString());
     }
 
+//    printf("End\n\n");
     return Ret;
 }
 
 bool Mesh::InitFromScene(const aiScene* pScene, const std::string& Filename)
 {
+//    printf("Mesh::InitFromScene %d\n", pScene->mNumMeshes);
     m_Entries.resize(pScene->mNumMeshes);
     m_Textures.resize(pScene->mNumMaterials);
 
     // Инициализируем меши один за другим
     for (unsigned int i = 0; i < m_Entries.size(); i++){
+//        printf("Inside\n");
         const aiMesh* paiMesh = pScene->mMeshes[i];
         InitMesh(i, paiMesh);
     }
@@ -166,24 +174,40 @@ bool Mesh::InitMaterials(const aiScene* pScene, const std::string& Filename)
 
 void Mesh::Render()
 {
+//    printf("Mesh::Render()\n");
     glEnableVertexAttribArray(0);
+//    printf("glEnableVertexAttribArray(0)\n");
     glEnableVertexAttribArray(1);
+//    printf("glEnableVertexAttribArray(1)\n");
     glEnableVertexAttribArray(2);
+//    printf("glEnableVertexAttribArray(2)\n");
+//    printf("size: %lu\n", m_Entries.size());
 
     for (unsigned int i = 0; i < m_Entries.size(); i++){
+//        printf("0\n");
         glBindBuffer(GL_ARRAY_BUFFER, m_Entries[i].VB);
+//        printf("1\n");
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
+//        printf("2\n");
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)12);
+//        printf("3\n");
         glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)20);
+//        printf("4\n");
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Entries[i].IB);
+//        printf("5\n");
 
         const unsigned int MaterialIndex = m_Entries[i].MaterialIndex;
+//        printf("6\n");
 
+//        printf("if (MaterialIndex < m_Textures.size() && m_Textures[MaterialIndex]){\n");
+//        printf("7\n");
         if (MaterialIndex < m_Textures.size() && m_Textures[MaterialIndex]){
+//            printf("8\n");
             m_Textures[MaterialIndex]->Bind(GL_TEXTURE0);
         }
 
+//        printf("glDrawElements\n");
         glDrawElements(GL_TRIANGLES, m_Entries[i].NumIndices, GL_UNSIGNED_INT, 0);
     }
 

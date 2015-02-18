@@ -32,10 +32,10 @@ struct Vertex
 class Mesh
 {
     public:
-        Mesh(){};
+        Mesh(){}
         ~Mesh(){
             Clear();
-        };
+        }
         bool LoadMesh(const std::string& Filename);
         void Render();
 
