@@ -72,7 +72,7 @@ public:
 
     void SetWVP(const Matrix4f& WVP);
     void SetWorldMatrix(const Matrix4f& WVP);
-    void SetTextureUnit(unsigned int TextureUnit);
+    void SetColor(const Vector3f& Color);
     void SetDirectionalLight(const DirectionalLight& Light);
     void SetPointLights(unsigned int NumLights, const PointLight* pLights);
     void SetSpotLights(unsigned int NumLights, const SpotLight* pLights);

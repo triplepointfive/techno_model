@@ -78,7 +78,7 @@ uniform int gNumSpotLights;                                                     
 uniform DirectionalLight gDirectionalLight;                                                 \n\
 uniform PointLight gPointLights[MAX_POINT_LIGHTS];                                          \n\
 uniform SpotLight gSpotLights[MAX_SPOT_LIGHTS];                                             \n\
-uniform sampler2D gSampler;                                                                 \n\
+uniform vec3 gSampler;                                                                      \n\
 uniform vec3 gEyeWorldPos;                                                                  \n\
 uniform float gMatSpecularIntensity;                                                        \n\
 uniform float gSpecularPower;                                                               \n\
@@ -153,7 +153,7 @@ void main()                                                                     
         TotalLight += CalcSpotLight(gSpotLights[i], Normal);                                \n\
     }                                                                                       \n\
                                                                                             \n\
-    FragColor = texture2D(gSampler, TexCoord0.xy) * TotalLight;                             \n\
+    FragColor = vec4(gSampler, 1.0) * TotalLight;                             \n\
 }";
 
 
@@ -301,9 +301,9 @@ void LightingTechnique::SetWorldMatrix(const Matrix4f& WorldInverse)
 }
 
 
-void LightingTechnique::SetTextureUnit(unsigned int TextureUnit)
+void LightingTechnique::SetColor(const Vector3f& Color)
 {
-    glUniform1i(m_samplerLocation, TextureUnit);
+    glUniform3f(m_samplerLocation, Color.x, Color.y, Color.z);
 }
 
 

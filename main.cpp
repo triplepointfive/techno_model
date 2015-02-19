@@ -104,8 +104,6 @@ public:
 
         m_pEffect->Enable();
 
-        m_pEffect->SetTextureUnit(0);
-
         m_pBase = new Mesh();
         m_pCouplingA = new Mesh();
         m_pCouplingB = new Mesh();
@@ -147,23 +145,23 @@ public:
 
 
         p.Rotate(90.0f, 0.0f, 0.0f);
-        RenderMesh(m_pBase, p);
+        RenderMesh(m_pBase, Vector3f(1.0f, 1.0f, 1.0f), p);
 
         p.Rotate(0.0f, 90.0f, m_scale);
         p.WorldPos(2.55f, 1.15f, 1.05f);
-        RenderMesh(m_pCouplingA, p);
+        RenderMesh(m_pCouplingA, Vector3f(0.8f, 0.0f, 0.4f), p);
 
         p.WorldPos(3.55f, 1.15f, 1.05f);
-        RenderMesh(m_pCouplingB, p);
+        RenderMesh(m_pCouplingB, Vector3f(0.0f, 0.8f, 0.0f), p);
 
         p.WorldPos(1.30, 1.15f, 1.05f);
-        RenderMesh(m_pCouplingInt, p);
+        RenderMesh(m_pCouplingInt, Vector3f(0.0f, 0.0f, 0.8f), p);
 
         TwDraw();
         glutSwapBuffers();
     }
 
-    virtual void RenderMesh(Mesh* p_mesh, Pipeline &p) {
+    virtual void RenderMesh(Mesh* p_mesh, const Vector3f &color, Pipeline &p) {
         // Render skeleton
 //        printf("1\n");
         m_pFrameEffect->Enable();
@@ -185,6 +183,8 @@ public:
 
         // Render mesh
         m_pEffect->Enable();
+
+        m_pEffect->SetColor(color);
         m_pEffect->SetWVP(p.GetWVPTrans());
         m_pEffect->SetWorldMatrix(p.GetWorldTrans());
         m_pEffect->SetDirectionalLight(m_directionalLight);
