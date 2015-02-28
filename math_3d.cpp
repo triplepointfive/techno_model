@@ -101,6 +101,13 @@ void Matrix4f::InitTranslationTransform(float x, float y, float z)
     m[3][0] = 0.0f; m[3][1] = 0.0f; m[3][2] = 0.0f; m[3][3] = 1.0f;
 }
 
+void Matrix4f::InitSphericalTransform(float p, float phi, float _z) {
+    float x = p * cos(phi);
+    float z = p * sin(phi);
+    float y = _z;
+//    printf("sigma=%f omega=%f r=%f x=%f y=%f z=%f\n", sigma, omega, r, x, y, z);
+    InitTranslationTransform(x, y, z);
+}
 
 void Matrix4f::InitCameraTransform(const Vector3f& Target, const Vector3f& Up)
 {

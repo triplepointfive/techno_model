@@ -170,6 +170,7 @@ public:
     void InitScaleTransform(float ScaleX, float ScaleY, float ScaleZ);
     void InitRotateTransform(float RotateX, float RotateY, float RotateZ);
     void InitTranslationTransform(float x, float y, float z);
+    void InitSphericalTransform(float omega, float sigma, float r);
     void InitCameraTransform(const Vector3f& Target, const Vector3f& Up);
     void InitPersProjTransform(float FOV, float Width, float Height, float zNear, float zFar);
 };

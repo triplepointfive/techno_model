@@ -60,6 +60,7 @@ public:
         m_directionalLight.Direction = Vector3f(1.0f, 0.0f, 1.0f);
         CreateVertexBuffer();
         CreateIndexBuffer();
+        model_dx = -2.05f;
     }
 
     virtual ~Main()
@@ -76,8 +77,8 @@ public:
 
     bool Init()
     {
-        Vector3f Pos(-10.0f, 4.0f, 0.0f);
-        Vector3f Target(1.0f, 0.0f, 1.0f);
+        Vector3f Pos(5.0f, 30.0f, 2.0f);
+        Vector3f Target(0.0f, 0.0f, 1.0f);
         Vector3f Up(0.0, 1.0f, 0.0f);
         m_pGameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT, Pos, Target, Up);
 
@@ -127,7 +128,7 @@ public:
         Pipeline p;
         p.Scale(0.005f, 0.005f, 0.005f);
         p.Rotate(0.0f, m_scale, 0.0f);
-        p.WorldPos(0.0f, 0.0f, 0.0f);
+        p.WorldPos(0.0f + model_dx, 0.0f, 0.0f);
         p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
         p.SetPerspectiveProj(60.0f, WINDOW_WIDTH, WINDOW_HEIGHT, 0.1f, 100.0f);
 
@@ -152,13 +153,13 @@ public:
 
         p.Scale(0.005f, 0.005f, 0.005f);
         p.Rotate(0.0f, 270.0f, m_scale);
-        p.WorldPos(2.55f, 1.15f, 0.625f);
+        p.WorldPos(2.55f + model_dx, 1.15f, 0.625f);
         RenderMesh(m_pCouplingA, Vector3f(0.8f, 0.0f, 0.4f), p);
 
-        p.WorldPos(3.55f, 1.15f, 1.20f);
+        p.WorldPos(3.55f + model_dx, 1.15f, 1.20f);
         RenderMesh(m_pCouplingB, Vector3f(0.0f, 0.8f, 0.0f), p);
 
-        p.WorldPos(1.30, 1.15f, 0.645f);
+        p.WorldPos(1.30 + model_dx, 1.15f, 0.645f);
         RenderMesh(m_pCouplingInt, Vector3f(0.0f, 0.0f, 0.8f), p);
 
         TwDraw();
@@ -166,24 +167,15 @@ public:
     }
 
     virtual void RenderMesh(Mesh* p_mesh, const Vector3f &color, Pipeline &p) {
-        // Render skeleton
-//        printf("1\n");
         m_pFrameEffect->Enable();
-//        printf("2\n");
         m_pFrameEffect->SetWVP(p.GetWVPTrans());
-//        printf("3\n");
 
         glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-//        printf("4\n");
         p_mesh->Render();
-//        printf("5\n");
         glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-//        printf("6\n");
         glLineWidth(2);
-//        printf("7\n");
 
         glDepthFunc(GL_LESS);
-//        printf("8\n");
 
         // Render mesh
         m_pEffect->Enable();
@@ -195,10 +187,8 @@ public:
         m_pEffect->SetEyeWorldPos(m_pGameCamera->GetPos());
         m_pEffect->SetMatSpecularIntensity(0.0f);
         m_pEffect->SetMatSpecularPower(0);
-//        printf("9\n");
 
         p_mesh->Render();
-//        printf("10\n");
     }
 
     virtual void IdleCB()
@@ -246,6 +236,8 @@ private:
     Camera* m_pGameCamera;
     float m_scale;
     DirectionalLight m_directionalLight;
+
+    double model_dx;
 };
 
 

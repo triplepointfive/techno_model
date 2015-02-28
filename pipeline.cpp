@@ -18,7 +18,7 @@ const Matrix4f& Pipeline::GetWVPTrans()
 
     Matrix4f CameraTranslationTrans, CameraRotateTrans, PersProjTrans;
 
-    CameraTranslationTrans.InitTranslationTransform(-m_camera.Pos.x, -m_camera.Pos.y, -m_camera.Pos.z);
+    CameraTranslationTrans.InitSphericalTransform(-m_camera.Pos.x, -m_camera.Pos.y, -m_camera.Pos.z);
     CameraRotateTrans.InitCameraTransform(m_camera.Target, m_camera.Up);
     PersProjTrans.InitPersProjTransform(m_persProj.FOV, m_persProj.Width, m_persProj.Height, m_persProj.zNear, m_persProj.zFar);
 

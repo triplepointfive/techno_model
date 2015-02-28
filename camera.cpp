@@ -2,7 +2,7 @@
 
 #include "camera.h"
 
-const static float STEP_SCALE = 0.1f;
+const static float STEP_SCALE = 0.05f;
 const static int MARGIN = 10;
 
 Camera::Camera(int WindowWidth, int WindowHeight)
@@ -79,34 +79,42 @@ bool Camera::OnKeyboard(int Key)
 
     case GLUT_KEY_UP:
         {
-            m_pos += (m_target * STEP_SCALE);
+        m_pos -= Vector3f(STEP_SCALE, 0.0f, 0.0f);
             Ret = true;
         }
         break;
 
     case GLUT_KEY_DOWN:
         {
-            m_pos -= (m_target * STEP_SCALE);
+        m_pos += Vector3f(STEP_SCALE, 0.0f, 0.0f);
             Ret = true;
         }
         break;
 
     case GLUT_KEY_LEFT:
         {
-            Vector3f Left = m_target.Cross(m_up);
-            Left.Normalize();
-            Left *= STEP_SCALE;
-            m_pos += Left;
+        m_pos += Vector3f(0.0f, STEP_SCALE, 0.0f);
             Ret = true;
         }
         break;
 
     case GLUT_KEY_RIGHT:
         {
-            Vector3f Right = m_up.Cross(m_target);
-            Right.Normalize();
-            Right *= STEP_SCALE;
-            m_pos += Right;
+        m_pos -= Vector3f(0.0f, STEP_SCALE, 0.0f);
+            Ret = true;
+        }
+        break;
+
+    case GLUT_KEY_PAGE_UP:
+        {
+            m_pos += Vector3f(0.0f, 0.0f, STEP_SCALE);
+            Ret = true;
+        }
+        break;
+
+    case GLUT_KEY_PAGE_DOWN:
+        {
+            m_pos -= Vector3f(0.0f, 0.0f, STEP_SCALE);
             Ret = true;
         }
         break;
