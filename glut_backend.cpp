@@ -6,6 +6,8 @@
 
 #include "glut_backend.h"
 
+double message = 0.25;
+
 static ICallbacks* s_pCallbacks = NULL;
 
 static void SpecialKeyboardCB(int Key, int x, int y){
@@ -61,11 +63,10 @@ bool GLUTBackendCreateWindow(unsigned int Width, unsigned int Height, unsigned i
     }
 
     TwInit(TW_OPENGL, NULL);
-    TwWindowSize(1024, 768);
-    TwBar * GUI = TwNewBar("Picking");
+    TwWindowSize(1280, 1024);
+    TwBar * GUI = TwNewBar("Data");
     TwSetParam(GUI, NULL, "refresh", TW_PARAM_CSTRING, 1, "0.1");
-    std::string message;
-    TwAddVarRW(GUI, "Last picked object", TW_TYPE_STDSTRING, &message, NULL);
+    TwAddVarRW(GUI, "Angular velocity", TW_TYPE_DOUBLE, &message, NULL);
 
     return true;
 }

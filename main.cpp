@@ -144,17 +144,21 @@ public:
         glDisableVertexAttribArray(0);
 
 
+
+        p.Scale(0.005f, 0.005f, 0.005f);
         p.Rotate(90.0f, 0.0f, 0.0f);
         RenderMesh(m_pBase, Vector3f(1.0f, 1.0f, 1.0f), p);
 
-        p.Rotate(0.0f, 90.0f, m_scale);
-        p.WorldPos(2.55f, 1.15f, 1.05f);
+
+        p.Scale(0.005f, 0.005f, 0.005f);
+        p.Rotate(0.0f, 270.0f, m_scale);
+        p.WorldPos(2.55f, 1.15f, 0.625f);
         RenderMesh(m_pCouplingA, Vector3f(0.8f, 0.0f, 0.4f), p);
 
-        p.WorldPos(3.55f, 1.15f, 1.05f);
+        p.WorldPos(3.55f, 1.15f, 1.20f);
         RenderMesh(m_pCouplingB, Vector3f(0.0f, 0.8f, 0.0f), p);
 
-        p.WorldPos(1.30, 1.15f, 1.05f);
+        p.WorldPos(1.30, 1.15f, 0.645f);
         RenderMesh(m_pCouplingInt, Vector3f(0.0f, 0.0f, 0.8f), p);
 
         TwDraw();
@@ -249,7 +253,7 @@ int main(int argc, char** argv)
 {
     GLUTBackendInit(argc, argv);
 
-    if (!GLUTBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, 32, false, "OpenGL tutors")) {
+    if (!GLUTBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, 32, false, "Simulation of two-stage reduction gear")) {
         return 1;
     }
 
