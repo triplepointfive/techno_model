@@ -56,11 +56,12 @@ public:
         m_scale = 0.0f;
         m_directionalLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
         m_directionalLight.AmbientIntensity = 1.0f;
-        m_directionalLight.DiffuseIntensity = 0.01f;
+        m_directionalLight.DiffuseIntensity = 0.3f;
         m_directionalLight.Direction = Vector3f(1.0f, 0.0f, 1.0f);
         CreateVertexBuffer();
         CreateIndexBuffer();
         model_dx = -2.05f;
+        wireflame_mode = false;
     }
 
     virtual ~Main()
@@ -120,6 +121,7 @@ public:
     virtual void RenderSceneCB()
     {
         m_pGameCamera->OnRender();
+        m_directionalLight.Direction = m_pGameCamera->GetTarget();
 
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
@@ -145,10 +147,11 @@ public:
         glDisableVertexAttribArray(0);
 
 
+        glDepthFunc(GL_LESS);
 
         p.Scale(0.005f, 0.005f, 0.005f);
         p.Rotate(90.0f, 0.0f, 0.0f);
-        RenderMesh(m_pBase, Vector3f(1.0f, 1.0f, 1.0f), p);
+        RenderMesh(m_pBase, Vector3f(0.8f, 0.8f, 0.8f), p);
 
 
         p.Scale(0.005f, 0.005f, 0.005f);
@@ -167,15 +170,15 @@ public:
     }
 
     virtual void RenderMesh(Mesh* p_mesh, const Vector3f &color, Pipeline &p) {
-        m_pFrameEffect->Enable();
-        m_pFrameEffect->SetWVP(p.GetWVPTrans());
+        if(wireflame_mode) {
+            m_pFrameEffect->Enable();
+            m_pFrameEffect->SetWVP(p.GetWVPTrans());
 
-        glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-        p_mesh->Render();
-        glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-        glLineWidth(2);
+            glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+            p_mesh->Render();
+            glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+        }
 
-        glDepthFunc(GL_LESS);
 
         // Render mesh
         m_pEffect->Enable();
@@ -216,6 +219,17 @@ public:
             case 's':
                 m_directionalLight.AmbientIntensity -= 0.05f;
                 break;
+
+            case 'z':
+                m_directionalLight.DiffuseIntensity += 0.05f;
+                break;
+
+            case 'x':
+                m_directionalLight.DiffuseIntensity -= 0.05f;
+                break;
+            case 'w':
+                wireflame_mode = !wireflame_mode;
+                break;
         }
     }
 
@@ -238,6 +252,7 @@ private:
     DirectionalLight m_directionalLight;
 
     double model_dx;
+    bool wireflame_mode;
 };
 
 
@@ -254,6 +269,7 @@ int main(int argc, char** argv)
     if (!pApp->Init()) {
         return 1;
     }
+    glLineWidth(2);
 
     pApp->Run();
 
