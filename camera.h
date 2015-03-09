@@ -33,6 +33,8 @@ public:
         return m_up;
     }
 
+    void WarpMouse() const;
+
 private:
 
     void Init();

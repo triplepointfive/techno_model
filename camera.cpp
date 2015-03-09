@@ -67,7 +67,7 @@ void Camera::Init()
     m_mousePos.x  = m_windowWidth / 2;
     m_mousePos.y  = m_windowHeight / 2;
 
-    glutWarpPointer(m_mousePos.x, m_mousePos.y);
+    WarpMouse();
 }
 
 
@@ -123,6 +123,9 @@ bool Camera::OnKeyboard(int Key)
     return Ret;
 }
 
+void Camera::WarpMouse() const {
+    glutWarpPointer(m_mousePos.x, m_mousePos.y);
+}
 
 void Camera::OnMouse(int x, int y)
 {
@@ -135,7 +138,7 @@ void Camera::OnMouse(int x, int y)
     m_AngleV += (float)DeltaY / 20.0f;
 
     Update();
-    glutWarpPointer(m_mousePos.x, m_mousePos.y);
+    WarpMouse();
 }
 
 

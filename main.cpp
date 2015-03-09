@@ -61,7 +61,9 @@ public:
         CreateVertexBuffer();
         CreateIndexBuffer();
         model_dx = -2.05f;
+
         wireflame_mode = false;
+        camera_on_mouse = true;
     }
 
     virtual ~Main()
@@ -211,19 +213,21 @@ public:
             case 'q':
                 glutLeaveMainLoop();
                 break;
-
+            case 'm':
+                if (!camera_on_mouse) {
+                    m_pGameCamera->WarpMouse();
+                }
+                camera_on_mouse = !camera_on_mouse;
+                break;
             case 'a':
                 m_directionalLight.AmbientIntensity += 0.05f;
                 break;
-
             case 's':
                 m_directionalLight.AmbientIntensity -= 0.05f;
                 break;
-
             case 'z':
                 m_directionalLight.DiffuseIntensity += 0.05f;
                 break;
-
             case 'x':
                 m_directionalLight.DiffuseIntensity -= 0.05f;
                 break;
@@ -236,7 +240,9 @@ public:
 
     virtual void PassiveMouseCB(int x, int y)
     {
-        m_pGameCamera->OnMouse(x, y);
+        if (camera_on_mouse) {
+            m_pGameCamera->OnMouse(x, y);
+        }
     }
 
 private:
@@ -253,6 +259,7 @@ private:
 
     double model_dx;
     bool wireflame_mode;
+    bool camera_on_mouse;
 };
 
 
