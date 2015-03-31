@@ -55,15 +55,15 @@ public:
         m_pFrameEffect = NULL;
         m_scale = 0.0f;
         m_directionalLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
-        m_directionalLight.AmbientIntensity = 1.0f;
-        m_directionalLight.DiffuseIntensity = 0.3f;
+        m_directionalLight.AmbientIntensity = 0.2f;
+        m_directionalLight.DiffuseIntensity = 0.7f;
         m_directionalLight.Direction = Vector3f(1.0f, 0.0f, 1.0f);
         CreateVertexBuffer();
         CreateIndexBuffer();
         model_dx = -2.05f;
 
         wireflame_mode = false;
-        camera_on_mouse = true;
+        camera_on_mouse = false;
     }
 
     virtual ~Main()
@@ -203,12 +203,14 @@ public:
 
     virtual void SpecialKeyboardCB(int Key, int x, int y)
     {
+        TwEventSpecialGLUT(Key, x, y);
         m_pGameCamera->OnKeyboard(Key);
     }
 
 
     virtual void KeyboardCB(unsigned char Key, int x, int y)
     {
+        TwEventKeyboardGLUT(Key, x,y);
         switch (Key) {
             case 'q':
                 glutLeaveMainLoop();
@@ -239,7 +241,8 @@ public:
 
 
     virtual void PassiveMouseCB(int x, int y)
-    {
+    {        
+        TwEventMouseMotionGLUT(x, y);
         if (camera_on_mouse) {
             m_pGameCamera->OnMouse(x, y);
         }

@@ -63,10 +63,17 @@ bool GLUTBackendCreateWindow(unsigned int Width, unsigned int Height, unsigned i
     }
 
     TwInit(TW_OPENGL, NULL);
+    // - Directly redirect GLUT mouse button events to AntTweakBar
+    glutMouseFunc((GLUTmousebuttonfun)TwEventMouseButtonGLUT);
+    // - Directly redirect GLUT mouse motion events to AntTweakBar
+    glutMotionFunc((GLUTmousemotionfun)TwEventMouseMotionGLUT);
+    // - Directly redirect GLUT mouse "passive" motion events to AntTweakBar (same as MouseMotion)
+    TwGLUTModifiersFunc(glutGetModifiers);
+
     TwWindowSize(1280, 1024);
     TwBar * GUI = TwNewBar("Data");
     TwSetParam(GUI, NULL, "refresh", TW_PARAM_CSTRING, 1, "0.1");
-    TwAddVarRW(GUI, "Angular velocity", TW_TYPE_DOUBLE, &message, NULL);
+    TwAddVarRW(GUI, "Angular velocity", TW_TYPE_DOUBLE, &message, " label='Strip length' min=1 max=1000 keyIncr=s keyDecr=S help='Number of segments of the strip.' ");
 
     return true;
 }
