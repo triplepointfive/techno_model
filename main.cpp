@@ -63,9 +63,13 @@ public:
         model_dx = -2.05f;
 
         wireflame_mode = false;
-        camera_on_mouse = false;
+        camera_on_mouse = true;
 
-        rotateStep = 0.1f;
+        k = 3.935f;
+        CouplingAColor = Vector3f(0.8f, 0.0f, 0.4f);
+        CouplingBColor = Vector3f(0.0f, 0.8f, 0.0f);
+        CouplingInitColor = Vector3f(0.0f, 0.0f, 0.8f);
+        rotateStep = 0.3f;
     }
 
     virtual ~Main()
@@ -125,7 +129,18 @@ public:
     void InitTwBar(TwBar *GUI){
 
         TwSetParam(GUI, NULL, "refresh", TW_PARAM_CSTRING, 1, "0.1");
-        TwAddVarRW(GUI, "Angular velocity", TW_TYPE_DOUBLE, &rotateStep, " label='Strip length' min=0.1 max=10 step=0.05 keyIncr=w keyDecr=W help='Number of segments of the strip.' ");
+        TwAddVarRW(GUI, "Angular velocity", TW_TYPE_DOUBLE, &rotateStep, " label='Ang. vel.' min=0.1 max=10 step=0.05 keyIncr=w keyDecr=W help='Angular velocity of a cogwheel.' ");
+        TwAddVarRW(GUI, "Kof", TW_TYPE_FLOAT, &k, " label='Ang. vel.' min=0.01 max=10 step=0.005 help='Angular velocity of a cogwheel.' ");
+
+
+        TwAddVarRW(GUI, "AmbientIntensity", TW_TYPE_FLOAT, &m_directionalLight.AmbientIntensity, " label='AmbientIntensity' step=0.05 help='AmbientIntensity' ");
+        TwAddVarRW(GUI, "DiffuseIntensity", TW_TYPE_FLOAT, &m_directionalLight.DiffuseIntensity, " label='DiffuseIntensity' step=0.05 help='DiffuseIntensity' ");
+        TwAddVarRW(GUI, "Coupling A", TW_TYPE_COLOR3F, &CouplingAColor, " group='Colors' ");
+        TwAddVarRW(GUI, "Coupling B", TW_TYPE_COLOR3F, &CouplingBColor, " group='Colors' ");
+        TwAddVarRW(GUI, "Coupling Init", TW_TYPE_COLOR3F, &CouplingInitColor, " group='Colors' ");
+
+//        TwAddVarRW(GUI, "", TW_TYPE_FLOAT, &k, " label='' step=0.05 help='' ");
+
     }
 
     virtual void RenderSceneCB()
@@ -165,15 +180,19 @@ public:
 
 
         p.Scale(0.005f, 0.005f, 0.005f);
-        p.Rotate(0.0f, 270.0f, m_scale);
+        p.Rotate(0.0f, 270.0f, - m_scale * k);
         p.WorldPos(2.55f + model_dx, 1.15f, 0.625f);
-        RenderMesh(m_pCouplingA, Vector3f(0.8f, 0.0f, 0.4f), p);
+        RenderMesh(m_pCouplingA, CouplingAColor, p);
 
         p.WorldPos(3.55f + model_dx, 1.15f, 1.20f);
-        RenderMesh(m_pCouplingB, Vector3f(0.0f, 0.8f, 0.0f), p);
+
+        float k2 = 4.5f;
+        p.Rotate(0.0f, 270.0f, m_scale * k * k2);
+        RenderMesh(m_pCouplingB, CouplingBColor, p);
 
         p.WorldPos(1.30 + model_dx, 1.15f, 0.645f);
-        RenderMesh(m_pCouplingInt, Vector3f(0.0f, 0.0f, 0.8f), p);
+        p.Rotate(0.0f, 270.0f, m_scale);
+        RenderMesh(m_pCouplingInt, CouplingInitColor, p);
 
         TwDraw();
         glutSwapBuffers();
@@ -264,6 +283,7 @@ private:
     GradientTechnique* m_pGradientEffect;
     FrameTechnique* m_pFrameEffect;
     Mesh *m_pBase, *m_pCouplingA, *m_pCouplingB, *m_pCouplingInt;
+    Vector3f CouplingAColor, CouplingInitColor, CouplingBColor;
     Camera* m_pGameCamera;
     float m_scale;
     DirectionalLight m_directionalLight;
@@ -273,6 +293,7 @@ private:
     double model_dx;
     bool wireflame_mode;
     bool camera_on_mouse;
+    float k;
 };
 
 
