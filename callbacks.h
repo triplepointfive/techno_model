@@ -1,6 +1,8 @@
 #ifndef CALLBACKS_H
 #define CALLBACKS_H
 
+#include <AntTweakBar.h>
+
 class ICallbacks
 {
     public:
@@ -9,7 +11,8 @@ class ICallbacks
         virtual void PassiveMouseCB(int x, int y) = 0;
         virtual void RenderSceneCB() = 0;
         virtual void IdleCB() = 0;
-        virtual ~ICallbacks() {};
+        virtual ~ICallbacks() {}
+        virtual void InitTwBar(TwBar *GUI) = 0;
 };
 
 #endif /* CALLBACKS_H */

@@ -64,6 +64,8 @@ public:
 
         wireflame_mode = false;
         camera_on_mouse = false;
+
+        rotateStep = 0.1f;
     }
 
     virtual ~Main()
@@ -120,6 +122,12 @@ public:
         GLUTBackendRun(this);
     }
 
+    void InitTwBar(TwBar *GUI){
+
+        TwSetParam(GUI, NULL, "refresh", TW_PARAM_CSTRING, 1, "0.1");
+        TwAddVarRW(GUI, "Angular velocity", TW_TYPE_DOUBLE, &rotateStep, " label='Strip length' min=0.1 max=10 step=0.05 keyIncr=w keyDecr=W help='Number of segments of the strip.' ");
+    }
+
     virtual void RenderSceneCB()
     {
         m_pGameCamera->OnRender();
@@ -127,7 +135,7 @@ public:
 
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-        m_scale += 0.1f;
+        m_scale += rotateStep;
 
         Pipeline p;
         p.Scale(0.005f, 0.005f, 0.005f);
@@ -259,6 +267,8 @@ private:
     Camera* m_pGameCamera;
     float m_scale;
     DirectionalLight m_directionalLight;
+
+    double rotateStep;
 
     double model_dx;
     bool wireflame_mode;

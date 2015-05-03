@@ -6,8 +6,6 @@
 
 #include "glut_backend.h"
 
-double message = 0.25;
-
 static ICallbacks* s_pCallbacks = NULL;
 
 static void SpecialKeyboardCB(int Key, int x, int y){
@@ -44,6 +42,20 @@ void GLUTBackendInit(int argc, char** argv){
     glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
 }
 
+void TwInitWindow() {
+    TwInit(TW_OPENGL, NULL);
+    // - Directly redirect GLUT mouse button events to AntTweakBar
+    glutMouseFunc((GLUTmousebuttonfun)TwEventMouseButtonGLUT);
+    // - Directly redirect GLUT mouse motion events to AntTweakBar
+    glutMotionFunc((GLUTmousemotionfun)TwEventMouseMotionGLUT);
+    // - Directly redirect GLUT mouse "passive" motion events to AntTweakBar (same as MouseMotion)
+    TwGLUTModifiersFunc(glutGetModifiers);
+
+    TwWindowSize(1280, 1024);
+    TwBar * GUI = TwNewBar("Data");
+    s_pCallbacks->InitTwBar(GUI);
+}
+
 bool GLUTBackendCreateWindow(unsigned int Width, unsigned int Height, unsigned int bpp, bool isFullScreen, const char* pTitle){
     if (isFullScreen){
         char ModeString[64] = {0};
@@ -61,19 +73,6 @@ bool GLUTBackendCreateWindow(unsigned int Width, unsigned int Height, unsigned i
         fprintf(stderr, "Error: '%s'\n", glewGetErrorString(res));
         return false;
     }
-
-    TwInit(TW_OPENGL, NULL);
-    // - Directly redirect GLUT mouse button events to AntTweakBar
-    glutMouseFunc((GLUTmousebuttonfun)TwEventMouseButtonGLUT);
-    // - Directly redirect GLUT mouse motion events to AntTweakBar
-    glutMotionFunc((GLUTmousemotionfun)TwEventMouseMotionGLUT);
-    // - Directly redirect GLUT mouse "passive" motion events to AntTweakBar (same as MouseMotion)
-    TwGLUTModifiersFunc(glutGetModifiers);
-
-    TwWindowSize(1280, 1024);
-    TwBar * GUI = TwNewBar("Data");
-    TwSetParam(GUI, NULL, "refresh", TW_PARAM_CSTRING, 1, "0.1");
-    TwAddVarRW(GUI, "Angular velocity", TW_TYPE_DOUBLE, &message, " label='Strip length' min=1 max=1000 keyIncr=s keyDecr=S help='Number of segments of the strip.' ");
 
     return true;
 }
@@ -94,5 +93,7 @@ void GLUTBackendRun(ICallbacks* pCallbacks){
 
     s_pCallbacks = pCallbacks;
     InitCallbacks();
+    TwInitWindow();
     glutMainLoop();
 }
+
