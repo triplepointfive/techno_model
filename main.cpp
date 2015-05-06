@@ -20,6 +20,9 @@
 GLuint VBO;
 GLuint IBO;
 
+const float k = 3.935f;
+const float k2 = 4.5f;
+
 static void CreateVertexBuffer()
 {
     Vector2f Vertices[4];
@@ -53,7 +56,6 @@ public:
         m_pEffect = NULL;
         m_pGradientEffect = NULL;
         m_pFrameEffect = NULL;
-        m_scale = 0.0f;
         m_directionalLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
         m_directionalLight.AmbientIntensity = 0.2f;
         m_directionalLight.DiffuseIntensity = 0.7f;
@@ -65,11 +67,22 @@ public:
         wireflame_mode = false;
         camera_on_mouse = true;
 
-        k = 3.935f;
+
+        m_scale1 = 0.0f;
+        m_scale2 = 0.0f;
+        m_scale3 = 0.0f;
+
         CouplingAColor = Vector3f(0.8f, 0.0f, 0.4f);
         CouplingBColor = Vector3f(0.0f, 0.8f, 0.0f);
         CouplingInitColor = Vector3f(0.0f, 0.0f, 0.8f);
-        rotateStep = 0.3f;
+
+        rotateStep1 = 0.3f;
+        rotateStep2 = rotateStep1 * k;
+        rotateStep3 = rotateStep2 * k2;
+
+        rotateStep1Prev = rotateStep1;
+        rotateStep2Prev = rotateStep2;
+        rotateStep3Prev = rotateStep3;
     }
 
     virtual ~Main()
@@ -129,18 +142,17 @@ public:
     void InitTwBar(TwBar *GUI){
 
         TwSetParam(GUI, NULL, "refresh", TW_PARAM_CSTRING, 1, "0.1");
-        TwAddVarRW(GUI, "Angular velocity", TW_TYPE_DOUBLE, &rotateStep, " label='Ang. vel.' min=0.1 max=10 step=0.05 keyIncr=w keyDecr=W help='Angular velocity of a cogwheel.' ");
-        TwAddVarRW(GUI, "Kof", TW_TYPE_FLOAT, &k, " label='Ang. vel.' min=0.01 max=10 step=0.005 help='Angular velocity of a cogwheel.' ");
+        TwAddVarRW(GUI, "Velocity 1", TW_TYPE_DOUBLE, &rotateStep1, " label='Ang. vel. 1' min=0.1 max=10 step=0.05 keyIncr=w keyDecr=W help='Angular velocity of a cogwheel 1.' ");
+        TwAddVarRW(GUI, "Velocity 2", TW_TYPE_DOUBLE, &rotateStep2, " label='Ang. vel. 2' min=0.1 max=10 step=0.05 keyIncr=w keyDecr=W help='Angular velocity of a cogwheel 2.' ");
+        TwAddVarRW(GUI, "Velocity 3", TW_TYPE_DOUBLE, &rotateStep3, " label='Ang. vel. 3' min=0.1 max=10 step=0.05 keyIncr=w keyDecr=W help='Angular velocity of a cogwheel 3.' ");
 
 
         TwAddVarRW(GUI, "AmbientIntensity", TW_TYPE_FLOAT, &m_directionalLight.AmbientIntensity, " label='AmbientIntensity' step=0.05 help='AmbientIntensity' ");
         TwAddVarRW(GUI, "DiffuseIntensity", TW_TYPE_FLOAT, &m_directionalLight.DiffuseIntensity, " label='DiffuseIntensity' step=0.05 help='DiffuseIntensity' ");
+        TwAddVarRW(GUI, "Wireframe", TW_TYPE_BOOL8, &wireflame_mode, " label='Wireframe' help='Wireframe mode' ");
         TwAddVarRW(GUI, "Coupling A", TW_TYPE_COLOR3F, &CouplingAColor, " group='Colors' ");
         TwAddVarRW(GUI, "Coupling B", TW_TYPE_COLOR3F, &CouplingBColor, " group='Colors' ");
         TwAddVarRW(GUI, "Coupling Init", TW_TYPE_COLOR3F, &CouplingInitColor, " group='Colors' ");
-
-//        TwAddVarRW(GUI, "", TW_TYPE_FLOAT, &k, " label='' step=0.05 help='' ");
-
     }
 
     virtual void RenderSceneCB()
@@ -150,11 +162,11 @@ public:
 
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-        m_scale += rotateStep;
+        updateVelocity();
 
         Pipeline p;
         p.Scale(0.005f, 0.005f, 0.005f);
-        p.Rotate(0.0f, m_scale, 0.0f);
+//        p.Rotate(0.0f, m_scale, 0.0f);
         p.WorldPos(0.0f + model_dx, 0.0f, 0.0f);
         p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
         p.SetPerspectiveProj(60.0f, WINDOW_WIDTH, WINDOW_HEIGHT, 0.1f, 100.0f);
@@ -180,18 +192,17 @@ public:
 
 
         p.Scale(0.005f, 0.005f, 0.005f);
-        p.Rotate(0.0f, 270.0f, - m_scale * k);
+        p.Rotate(0.0f, 270.0f, - m_scale2);
         p.WorldPos(2.55f + model_dx, 1.15f, 0.625f);
         RenderMesh(m_pCouplingA, CouplingAColor, p);
 
         p.WorldPos(3.55f + model_dx, 1.15f, 1.20f);
 
-        float k2 = 4.5f;
-        p.Rotate(0.0f, 270.0f, m_scale * k * k2);
+        p.Rotate(0.0f, 270.0f, m_scale3);
         RenderMesh(m_pCouplingB, CouplingBColor, p);
 
         p.WorldPos(1.30 + model_dx, 1.15f, 0.645f);
-        p.Rotate(0.0f, 270.0f, m_scale);
+        p.Rotate(0.0f, 270.0f, m_scale1);
         RenderMesh(m_pCouplingInt, CouplingInitColor, p);
 
         TwDraw();
@@ -228,6 +239,29 @@ public:
         RenderSceneCB();
     }
 
+    void updateVelocity()
+    {
+        if (rotateStep1Prev != rotateStep1) {
+            rotateStep2 = rotateStep1 * k;
+            rotateStep3 = rotateStep2 * k2;
+        } else if (rotateStep2Prev != rotateStep2) {
+            rotateStep1 = rotateStep2 / k;
+            rotateStep3 = rotateStep2 * k2;
+        } else if (rotateStep3Prev != rotateStep3) {
+            rotateStep2 = rotateStep3 / k2;
+            rotateStep1 = rotateStep2 / k;
+        }
+
+        rotateStep1Prev = rotateStep1;
+        rotateStep2Prev = rotateStep2;
+        rotateStep3Prev = rotateStep3;
+
+        m_scale1 += rotateStep1;
+        m_scale2 += rotateStep2;
+        m_scale3 += rotateStep3;
+
+    }
+
     virtual void SpecialKeyboardCB(int Key, int x, int y)
     {
         TwEventSpecialGLUT(Key, x, y);
@@ -248,21 +282,21 @@ public:
                 }
                 camera_on_mouse = !camera_on_mouse;
                 break;
-            case 'a':
-                m_directionalLight.AmbientIntensity += 0.05f;
-                break;
-            case 's':
-                m_directionalLight.AmbientIntensity -= 0.05f;
-                break;
-            case 'z':
-                m_directionalLight.DiffuseIntensity += 0.05f;
-                break;
-            case 'x':
-                m_directionalLight.DiffuseIntensity -= 0.05f;
-                break;
-            case 'w':
-                wireflame_mode = !wireflame_mode;
-                break;
+//            case 'a':
+//                m_directionalLight.AmbientIntensity += 0.05f;
+//                break;
+//            case 's':
+//                m_directionalLight.AmbientIntensity -= 0.05f;
+//                break;
+//            case 'z':
+//                m_directionalLight.DiffuseIntensity += 0.05f;
+//                break;
+//            case 'x':
+//                m_directionalLight.DiffuseIntensity -= 0.05f;
+//                break;
+//            case 'w':
+//                wireflame_mode = !wireflame_mode;
+//                break;
         }
     }
 
@@ -285,15 +319,14 @@ private:
     Mesh *m_pBase, *m_pCouplingA, *m_pCouplingB, *m_pCouplingInt;
     Vector3f CouplingAColor, CouplingInitColor, CouplingBColor;
     Camera* m_pGameCamera;
-    float m_scale;
+    float m_scale1, m_scale2, m_scale3;
     DirectionalLight m_directionalLight;
 
-    double rotateStep;
+    double rotateStep1, rotateStep2, rotateStep3, rotateStep1Prev, rotateStep2Prev, rotateStep3Prev;
 
     double model_dx;
     bool wireflame_mode;
     bool camera_on_mouse;
-    float k;
 };
 
 
