@@ -71,6 +71,8 @@ public:
         m_scale1 = 0.0f;
         m_scale2 = 0.0f;
         m_scale3 = 0.0f;
+        torque   = 124;
+        efficiency = 0.95;
 
         CouplingAColor = Vector3f(0.8f, 0.0f, 0.4f);
         CouplingBColor = Vector3f(0.0f, 0.8f, 0.0f);
@@ -147,6 +149,13 @@ public:
         TwAddVarRW(GUI, "Velocity 3", TW_TYPE_DOUBLE, &rotateStep3, " label='Ang. vel. 3' min=0.1 max=10 step=0.05 keyIncr=w keyDecr=W help='Angular velocity of a cogwheel 3.' ");
 
 
+        TwAddVarRW(GUI, "Torque", TW_TYPE_DOUBLE, &torque, " label='Torque' min=1 max=250 step=1");
+        TwAddVarRW(GUI, "Reductor power", TW_TYPE_DOUBLE, &reductorPower, " label='Reductor power'");
+        TwAddVarRW(GUI, "Engine power", TW_TYPE_DOUBLE, &enginePower, " label='Engine power'");
+
+
+
+        TwAddSeparator(GUI, "Graphic parameters", NULL);
         TwAddVarRW(GUI, "AmbientIntensity", TW_TYPE_FLOAT, &m_directionalLight.AmbientIntensity, " label='AmbientIntensity' step=0.05 help='AmbientIntensity' ");
         TwAddVarRW(GUI, "DiffuseIntensity", TW_TYPE_FLOAT, &m_directionalLight.DiffuseIntensity, " label='DiffuseIntensity' step=0.05 help='DiffuseIntensity' ");
         TwAddVarRW(GUI, "Wireframe", TW_TYPE_BOOL8, &wireflame_mode, " label='Wireframe' help='Wireframe mode' ");
@@ -260,6 +269,8 @@ public:
         m_scale2 += rotateStep2;
         m_scale3 += rotateStep3;
 
+        enginePower = rotateStep3 * torque;
+        reductorPower = efficiency * enginePower;
     }
 
     virtual void SpecialKeyboardCB(int Key, int x, int y)
@@ -323,6 +334,7 @@ private:
     DirectionalLight m_directionalLight;
 
     double rotateStep1, rotateStep2, rotateStep3, rotateStep1Prev, rotateStep2Prev, rotateStep3Prev;
+    double enginePower, reductorPower, torque, efficiency;
 
     double model_dx;
     bool wireflame_mode;
